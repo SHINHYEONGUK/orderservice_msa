@@ -26,7 +26,8 @@ public class UserService {
     // repository 객체를 자동으로 주입받자. (JPA가 만들어서 컨테이너에 등록해 놓음)
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-
+    
+    // 메롱
     // 컨트롤러가 이 메서드를 호출할 것이다.
     // 그리고 지가 전달받은 dto를 그대로 넘길 것이다.
     public User userCreate(UserSaveReqDto dto) {
