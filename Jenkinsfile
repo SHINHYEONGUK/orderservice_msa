@@ -106,9 +106,7 @@ pipeline {
 
         // 5단계: EC2 서버로 docker-compose.yml 전송, 이미지 pull & 서비스 재시작
         stage('Deploy Changed Services to AWS EC2') {
-            when {
-                expression { env.CHANGED_SERVICES != "" }
-            }
+
             steps {
                 // SSH Private Key(예: deploy-key)로 SSH/SCP 명령 실행
                 sshagent(credentials: ["deploy-key"]) {
