@@ -126,9 +126,7 @@ pipeline {
             }
 
             stage('Deploy Changed Services to AWS EC2') {
-                when {
-                    expression { env.CHANGED_SERVICES != "" }
-                }
+
                 steps {
                     sshagent(credentials: ["deploy-key"]) {
                         sh """
@@ -140,7 +138,7 @@ pipeline {
                         cd /home/ubuntu && \
 
                         # 시간이 지나 로그인 만료 시 필요한 명령
-                        aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+                        aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_URL} && \
 
                         # docker compose를 이용해서 변경된 서비스만 이미지를 pull -> 일괄 실행
                         docker-compose pull ${env.CHANGED_SERVICES} && \
