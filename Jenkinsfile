@@ -144,7 +144,7 @@ pipeline {
 
                         # docker compose를 이용해서 변경된 서비스만 이미지를 pull -> 일괄 실행
                         docker-compose pull ${env.CHANGED_SERVICES} && \
-                        docker-compose up -d ${env.CHANGED_SERVICES}
+                        docker compose up -d ${env.CHANGED_SERVICES}
                         '
                         """
                     }
