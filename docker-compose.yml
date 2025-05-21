@@ -2,6 +2,12 @@
 # Docker Compose 파일 포맷의 버전을 지정합니다.
 version: '3.8'
 services:
+  app:
+    image: my-spring-app:latest
+    volumes:
+      - ./config/application-prod.yml:/app/config/application-prod.yml
+    environment:
+      SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   config-service:
     image: 221082190600.dkr.ecr.ap-northeast-2.amazonaws.com/config-service:latest
     container_name: config-service
