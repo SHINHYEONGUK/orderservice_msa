@@ -7,7 +7,7 @@ pipeline {
     agent any // 어느 젠킨스 서버에서나 실행이 가능
     environment {
         SERVICE_DIRS = "config-service,discovery-service,gateway-service,user-service,ordering-service,product-service"
-        ECR_URL = "872651651829.dkr.ecr.ap-northeast-2.amazonaws.com"
+        ECR_URL = "221082190600.dkr.ecr.ap-northeast-2.amazonaws.com"
         REGION = "ap-northeast-2"
     }
     stages {
