@@ -21,6 +21,16 @@ pipeline {
             }
         }
 
+        stage('Add Secret To Config-service') {
+            steps {
+                withCredentials([file(credentialsId: 'config-secret', variable:'configSecret' )]) {
+                    script {
+                        sh 'cp $configSecret config-service/src/main/resources/application-dev.yml'
+                    }
+                }
+            }
+        }
+
         // 2단계: 어떤 서비스가 변경됐는지 감지 (최초 커밋이면 전체 빌드)
         stage('Detect Changes') {
             steps {
@@ -89,15 +99,18 @@ pipeline {
                     withAWS(region: "${env.REGION}", credentials: "aws-key") {
                         def changedServices = env.CHANGED_SERVICES.split(",")
                         changedServices.each { service ->
-                            sh """
-                            # ECR 로그인 (실전에서는 credential helper 대신 AWS CLI 로그인이 더 일반적)
-                            aws ecr get-login-password --region ${env.REGION} | docker login --username AWS --password-stdin ${env.ECR_URL}
+                          // secret 파일이 필요한 경우만 credentials 호출
+                          sh """
+                          # ECR 로그인 (실전에서는 credential helper 대신 AWS CLI 로그인이 더 일반적)
+                          aws ecr get-login-password --region ${env.REGION} | docker login --username AWS --password-stdin ${env.ECR_URL}
 
-                            # 도커 이미지 빌드 및 푸시
-                            docker build -t ${service}:latest ${service}
-                            docker tag ${service}:latest ${env.ECR_URL}/${service}:latest
-                            docker push ${env.ECR_URL}/${service}:latest
-                            """
+                          # 도커 이미지 빌드 및 푸시
+                          docker build -t ${service}:latest ${service}
+                          docker tag ${service}:latest ${env.ECR_URL}/${service}:latest
+                          docker push ${env.ECR_URL}/${service}:latest
+                          """
+
+
                         }
                     }
                 }
