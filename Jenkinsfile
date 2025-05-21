@@ -7,7 +7,7 @@ pipeline {
     agent any // 어느 젠킨스 서버에서나 실행이 가능
     environment {
         SERVICE_DIRS = "config-service,discovery-service,gateway-service,user-service,ordering-service,product-service"
-        ECR_URL = "221082190600.dkr.ecr.ap-northeast-2.amazonaws.com/orderservice-image"
+        ECR_URL = "221082190600.dkr.ecr.ap-northeast-2.amazonaws.com"
         REGION = "ap-northeast-2"
     }
     stages {
@@ -113,6 +113,7 @@ pipeline {
 
                             # Docker에게 push 명령을 내리면 지정된 URL로 push할 수 있게 설정.
                             # 자동으로 로그인 도구를 쓰게 설정
+                            mkdir -p ~/.docker
                             echo '{"credHelpers": {"${ECR_URL}": "ecr-login"}}' > ~/.docker/config.json
 
                             docker build -t ${service}:latest ${service}
