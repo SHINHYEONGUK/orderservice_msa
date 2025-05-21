@@ -1,5 +1,5 @@
 // 자주 사용되는 필요한 변수를 전역으로 선언하는 것도 가능.
-def ecrLoginHelper = "docker-credentials-ecr-login" // ECR credential helper 이름
+def ecrLoginHelper = "docker-credential-ecr-login" // ECR credential helper 이름
 
 
 // 젠킨스의 선언형 파이프라인 정의부 시작 (그루비 언어)
@@ -27,10 +27,12 @@ pipeline {
                                         .toInteger()
                     def changedServices = []
                     def serviceDirs = env.SERVICE_DIRS.split(",")
+
                     if (commitCount == 1) {
                         // 최초 커밋이라면 모든 서비스 빌드
                         echo "Initial commit detected. All services will be built."
                         changedServices = serviceDirs // 변경된 서비스는 모든 서비스다.
+
                     } else {
                         // 변경된 파일 감지
                         def changedFiles = sh(script: "git diff --name-only HEAD~1 HEAD", returnStdout: true)
@@ -44,7 +46,6 @@ pipeline {
                         echo "Changed files: ${changedFiles}"
 
 
-
                         serviceDirs.each { service ->
                             // changedFiles라는 리스트를 조회해서 service 변수에 들어온 서비스 이름과
                             // 하나라도 일치하는 이름이 있다면 true, 하나도 존재하지 않으면 false
@@ -54,9 +55,6 @@ pipeline {
                             }
                         }
                     }
-
-
-
 
                     //변경된 서비스 이름을 모아놓은 리스트를 다른 스테이지에서도 사용하기 위해 환경 변수로 선언.
                     // join() -> 지정한 문자열을 구분자로 하여 리스트 요소를 하나의 문자열로 리턴. 중복 제거.
@@ -94,22 +92,19 @@ pipeline {
         }
 
         stage('Build Docker Image & Push to AWS ECR') {
-            when {
-                expression { env.CHANGED_SERVICES != ""}
-            }
+
             steps {
                 script {
                     // jenkins에 저장된 credentials를 사용하여 AWS 자격증명을 설정.
-                    withAWS(region: "${REGION}", credentials:"aws-key") {
-                        def changedServices = env.CHANGED_SERVICES.split(",")
+                    withAWS(region: "${REGION}", credentials: "aws-key") {
+                        def changedServices = env.SERVICE_DIRS.split(",")
                         changedServices.each { service ->
                             sh """
                             # ECR에 이미지를 push하기 위해 인증 정보를 대신 검증해 주는 도구 다운로드.
-                            # /user/local/bin/ 경로에 해당 파일을 이동
+                            # /usr/local/bin/ 경로에 해당 파일을 이동
                             curl -O https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/${ecrLoginHelper}
                             chmod +x ${ecrLoginHelper}
                             mv ${ecrLoginHelper} /usr/local/bin/
-
 
                             # Docker에게 push 명령을 내리면 지정된 URL로 push할 수 있게 설정.
                             # 자동으로 로그인 도구를 쓰게 설정
@@ -122,6 +117,7 @@ pipeline {
                             """
                         }
                     }
+
 
                 }
             }
