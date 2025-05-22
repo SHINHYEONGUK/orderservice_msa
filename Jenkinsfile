@@ -1,6 +1,6 @@
 // 자주 사용되는 필요한 변수를 전역으로 선언하는 것도 가능.
 def ecrLoginHelper = "docker-credential-ecr-login" // ECR credential helper 이름
-def deployHost = "54.180.148.191" // 배포 인스턴스의 private 주소(여기만 수정)
+def deployHost = "43.202.66.129" // 배포 인스턴스의 private 주소(여기만 수정)
 
 // 젠킨스의 선언형 파이프라인 정의부 시작 (그루비 언어)
 pipeline {
