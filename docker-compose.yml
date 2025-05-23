@@ -92,12 +92,6 @@ services:
     networks:
       - msa-network
 
-  mysql-db:
-    image: mysql:8
-    ports:
-      - "3316:3306"
-    networks:
-      - msa-network
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: orderservice
